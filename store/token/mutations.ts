@@ -1,5 +1,5 @@
 import { MutationTree } from 'vuex'
-import { ITokensMap, ITokenState } from '~/store/token/state'
+import {ITokensMap, ITokenState, IUserBalance} from '~/store/token/state'
 
 const mutations: MutationTree<ITokenState> = {
   SET_TOKENS_MAP: (state, payload: ITokensMap) => (state.tokensMap = {
@@ -16,7 +16,9 @@ const mutations: MutationTree<ITokenState> = {
       ...state.tokensMap,
       [address]: token
     }
-  }
+  },
+  SET_USER_BALANCES: (state, payload: Array<IUserBalance>) => (state.userBalances = payload),
+  SET_USER_ALLOWANCE: (state, payload: string) => (state.userAllowance = payload)
 }
 
 export default mutations

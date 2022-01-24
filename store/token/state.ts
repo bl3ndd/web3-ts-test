@@ -6,10 +6,18 @@ export interface ITokensMap {
 
 export interface ITokenState {
   tokensMap: ITokensMap
+  userBalances: Array<IUserBalance>
+  userAllowance: string
+}
+
+export interface IUserBalance {
+  [key: string]: string
 }
 
 export const initState = (): ITokenState => ({
-  tokensMap: {}
+  tokensMap: {},
+  userBalances: [],
+  userAllowance: '',
 })
 
 export default initState

@@ -1,8 +1,14 @@
 <template>
   <div class="primary">
     <div class="primary__template template">
-      <div class="template__header">
-        Header
+      <div class="template__header header">
+        <div class="header__button">
+          <b-button
+            @click="connectMetamaskWallet"
+          >
+            Connect Wallet
+          </b-button>
+        </div>
       </div>
       <div class="template__content">
         <nuxt />
@@ -17,14 +23,24 @@
 </template>
 <script lang="ts">
 import MainVue from '~/mixins/MainVue'
+import { connectWallet } from "~/utils/web3";
+import {mapActions, mapGetters} from "vuex";
 
 export default MainVue.extend({
-  mounted () {
-    this.SetLoader(true)
-    setTimeout(() => {
-      this.SetLoader(false)
-    }, 1000)
-  }
+  computed: {
+    ...mapGetters({
+      userBalances: 'token/getUserBalances',
+    })
+  },
+  methods: {
+    ...mapActions({
+      getUserBalances: 'token/getUserBalances',
+    }),
+    async connectMetamaskWallet() {
+        await connectWallet();
+        await this.getUserBalances();
+    },
+  },
 })
 </script>
 <style lang="scss" scoped>
@@ -46,6 +62,16 @@ export default MainVue.extend({
     flex-direction: column;
     align-items: center;
     position: relative;
+  }
+}
+.header {
+  @include container;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  &__button {
+    width: fit-content;
+    margin: 0 0 0 auto;
   }
 }
 </style>

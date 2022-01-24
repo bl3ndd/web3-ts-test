@@ -2,8 +2,9 @@ import Web3 from 'web3'
 // @ts-ignore
 import Web4 from '@cryptonteam/web4'
 import BigNumber from 'bignumber.js'
-import { output, error, IResponse } from '~/utils/index'
+import {output, error, IResponse, shiftedBy} from '~/utils/index'
 import { ERC20 } from '~/utils/abis'
+import {TOKENS} from "~/utils/constants";
 
 const { IS_MAINNET } = process.env
 
@@ -32,40 +33,40 @@ export const createInst = async (abi: Array<any>, address: string): Promise<any>
   return await abs.getInstance(address)
 }
 
-export const startPingingMetamask = (callback: any): IResponse => {
-  try {
-    if (web3Wallet === undefined) {
-      return error(500, 'pingingMetamask err')
-    }
-    const referenceAddress = userAddress
-    const referenceChainId = chainId
-    clearInterval(pingTimer)
-    pingTimer = setInterval(async () => {
-      const address = await web3Wallet.eth.getCoinbase()
-      const localChainId = await web3Wallet.eth.net.getId()
-      if (address !== referenceAddress || localChainId !== referenceChainId) {
-        chainId = -1
-        userAddress = ''
-        callback()
-        clearInterval(pingTimer)
-      }
-    }, 2000)
-    return output()
-  } catch (err) {
-    return error(500, 'pingingMetamask err', err)
-  }
-}
+// export const startPingingMetamask = (callback: any): IResponse => {
+//   try {
+//     if (web3Wallet === undefined) {
+//       return error(500, 'pingingMetamask err')
+//     }
+//     const referenceAddress = userAddress
+//     const referenceChainId = chainId
+//     clearInterval(pingTimer)
+//     pingTimer = setInterval(async () => {
+//       const address = await web3Wallet.eth.getCoinbase()
+//       const localChainId = await web3Wallet.eth.net.getId()
+//       if (address !== referenceAddress || localChainId !== referenceChainId) {
+//         chainId = -1
+//         userAddress = ''
+//         callback()
+//         clearInterval(pingTimer)
+//       }
+//     }, 2000)
+//     return output()
+//   } catch (err) {
+//     return error(500, 'pingingMetamask err', err)
+//   }
+// }
 
-export const example1 = async (): Promise<IResponse> => {
-  const r = await fetchContractData(
-    'balanceOf',
-    ERC20,
-    '0x4b107a23361770534bd1839171bbf4b0eb56485c',
-    ['0xBC6ae91F55af580B4C0E8c32D7910d00D3dbe54d']
-  )
-  console.log('balanceOf', r)
-  return output(r)
-}
+// export const example1 = async (): Promise<IResponse> => {
+//   const r = await fetchContractData(
+//     'balanceOf',
+//     ERC20,
+//     '0x4b107a23361770534bd1839171bbf4b0eb56485c',
+//     ['0xBC6ae91F55af580B4C0E8c32D7910d00D3dbe54d']
+//   )
+//   console.log('balanceOf', r)
+//   return output(r)
+// }
 
 export const connectNode = (): IResponse => {
   try {
@@ -116,24 +117,6 @@ export const connectWallet = async (): Promise<IResponse> => {
     web4 = new Web4()
     web4.setProvider(ethereum, userAddress)
 
-    // const r = await sendTransaction(
-    //   'transfer',
-    //   ERC20,
-    //   '0x4b107a23361770534bd1839171bbf4b0eb56485c',
-    //   [
-    //     '0xa364f66f40b8117bbdb772c13ca6a3d36fe95b13', '321'
-    //   ]
-    // )
-
-    // const inst = new web3Wallet.eth.Contract(ERC20, '0x4b107a23361770534bd1839171bbf4b0eb56485c')
-    // const data = inst.methods.approve.apply(null, ['0xa364f66f40b8117bbdb772c13ca6a3d36fe95b13', '100']).encodeABI()
-    // const r = await web3Wallet.eth.sendTransaction({
-    //   to: '0x4b107a23361770534bd1839171bbf4b0eb56485c',
-    //   data,
-    //   from: userAddress
-    // })
-    // console.log(r)
-
     return output({ userAddress })
   } catch (err) {
     return error(4001, 'connection error', err)
@@ -157,6 +140,18 @@ export const getFee = async (method: string, abi: Array<any>, address: string, p
   }
 }
 
+export const getBalance = async (address: string, userAddress: string): Promise<any> => {
+    const resp = await fetchContractData('balanceOf', ERC20, address, [userAddress]);
+    return resp;
+}
+
+export const getDecimals = async (address: string): Promise<any> => {
+    const resp = await fetchContractData('decimals', ERC20, address);
+    return resp
+}
+
 export const getWeb3 = (): any => web3Wallet || web3Guest
 
 export const getUserAddress = (): string => userAddress
+
+export const getChainId = (): number => chainId
