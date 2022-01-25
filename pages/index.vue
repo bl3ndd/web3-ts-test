@@ -9,7 +9,10 @@
           v-model="amount"
         />
       </b-input-group>
-      <b-form-select v-model="selectedToken">
+      <b-form-select
+        v-model="selectedToken"
+        @change="fetchTransaction(selectedToken)"
+      >
         <template #first>
           <b-form-select-option :value="null" disabled>-- Please select a token --</b-form-select-option>
         </template>
@@ -18,7 +21,7 @@
           :key="token.address"
           :value="token"
         >
-          {{ token.name }}
+          {{ token.symbol }}
         </b-form-select-option>
       </b-form-select>
     </div>
@@ -40,12 +43,12 @@
     </div>
     <div class="content__buttons">
       <b-button
-        @click="fetchUserAllowance({ contractAddress: selectedToken.address, spenderAddress: recipientAddress })"
+        @click="fetchUserAllowance"
       >
         Get Allowance
       </b-button>
       <b-button
-        @click="approve({ tokenAddress: selectedToken.address ,spender: recipientAddress, amount })"
+        @click="approve"
       >
         Approve</b-button>
       <b-button
@@ -57,13 +60,16 @@
         Your Transactions
       </div>
       <div class="transactions__table table">
-        <div class="table__row">
+        <div
+          v-for="(transaction, index) in userTransactions"
+          :key="index"
+          class="table__row">
           <div class="table__cell cell">
             <div class="cell__title cell__title_bold">
               Type
             </div>
             <div class="cell__description">
-              Transfer
+              {{ transaction.type }}
             </div>
           </div>
           <div class="table__cell cell">
@@ -71,7 +77,7 @@
               From
             </div>
             <div class="cell__description">
-              0x22eD84554DF3B5269B0761886eCC71a3731Dd06F
+              {{ transaction.from }}
             </div>
           </div>
           <div class="table__cell cell">
@@ -79,7 +85,7 @@
               To
             </div>
             <div class="cell__description">
-              0x22eD84554DF3B5269B0761886eCC71a3731Dd06F
+              {{ transaction.to }}
             </div>
           </div>
           <div class="table__cell cell">
@@ -87,7 +93,7 @@
               Amount
             </div>
             <div class="cell__description">
-              1000 USDT
+              {{ transaction.amount }} {{ transaction.symbol }}
             </div>
           </div>
         </div>
@@ -101,8 +107,9 @@ import { mapActions, mapGetters } from 'vuex'
 import MainVue from '~/mixins/MainVue'
 import { TOKENS } from '@/utils/constants.js'
 import { shiftedBy } from '~/utils';
+import { IUserToken } from "~/store/token/types";
 
-export default {
+export default MainVue.extend({
   data: () => ({
     recipient: '',
     amount: '',
@@ -116,23 +123,43 @@ export default {
   computed: {
     ...mapGetters({
       userBalances: 'token/getUserBalances',
-      userAllowance: 'token/getUserAllowance'
+      userAllowance: 'token/getUserAllowance',
+      userTransactions: 'token/getUserTransactions',
     })
   },
   methods: {
     ...mapActions({
-      fetchUserAllowance: 'token/fetchUserAllowance',
+      fetchUserAllowanceAction: 'token/fetchUserAllowance',
       connectNode: 'web3/connectNode',
       connectWallet: 'web3/connectWallet',
-      approve: 'token/approve',
-      transferAction: 'token/transfer'
+      approveAction: 'token/approve',
+      transferAction: 'token/transfer',
+      fetchTransactionsAction: 'token/getTransactions',
     }),
+    approve() {
+      this.SetLoader(true)
+      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
+      this.approveAction({ tokenAddress: this.selectedToken.address ,spender: this.recipientAddress, amount })
+      this.SetLoader(false)
+    },
+    fetchUserAllowance() {
+      this.SetLoader(true)
+      this.fetchUserAllowanceAction({ contractAddress: this.selectedToken.address, spenderAddress: this.recipientAddress })
+      this.SetLoader(false)
+    },
     transfer() {
-      const transformedAmount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
-      this.transferAction({ tokenAddress: this.selectedToken.address, recipient: this.recipientAddress, amount:  transformedAmount })
+      this.SetLoader(true)
+      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
+      this.transferAction({ tokenAddress: this.selectedToken.address, recipient: this.recipientAddress, amount })
+      this.SetLoader(false)
+    },
+    async fetchTransaction(selectedToken: IUserToken) {
+      this.SetLoader(true)
+      await this.fetchTransactionsAction(selectedToken)
+      this.SetLoader(false)
     }
   }
-};
+});
 
 </script>
 <style lang="scss" scoped>
@@ -165,8 +192,8 @@ export default {
   }
   .table {
     &__row {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr 3fr 3fr 1fr;
       background-color: #F3F5FA;
       padding: 10px 20px;
     }

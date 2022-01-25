@@ -1,24 +1,17 @@
 import { MutationTree } from 'vuex'
-import {ITokensMap, ITokenState, IUserBalance} from '~/store/token/state'
+import {ITokenState, IUserBalance, ITransaction} from '~/store/token/types'
+import { TokenMutations } from '@/store/token/types'
 
-const mutations: MutationTree<ITokenState> = {
-  SET_TOKENS_MAP: (state, payload: ITokensMap) => (state.tokensMap = {
-    ...state.tokensMap,
-    ...payload
-  }),
-  SET_TOKEN_PROPS: (state, { address, value }: { address: string, value: Record<string, unknown>}) => {
-    const token = state.tokensMap[address]
-    const keys = Object.keys(value)
-    for (const key of keys) {
-      token[key] = value[key]
-    }
-    state.tokensMap = {
-      ...state.tokensMap,
-      [address]: token
-    }
-  },
-  SET_USER_BALANCES: (state, payload: Array<IUserBalance>) => (state.userBalances = payload),
-  SET_USER_ALLOWANCE: (state, payload: string) => (state.userAllowance = payload)
+export interface ITokenMutations<S = ITokenState> {
+  [TokenMutations.SET_USER_BALANCES](state: S, payload: Array<IUserBalance>): void,
+  [TokenMutations.SET_USER_ALLOWANCE](state: S, payload: number): void,
+  [TokenMutations.SET_USER_TRANSACTIONS](state: S, payload: Array<ITransaction>): void,
+}
+
+const mutations: MutationTree<ITokenState> & ITokenMutations = {
+  [TokenMutations.SET_USER_BALANCES]: (state, payload) => (state.userBalances = payload),
+  [TokenMutations.SET_USER_ALLOWANCE]: (state, payload) => (state.userAllowance = payload),
+  [TokenMutations.SET_USER_TRANSACTIONS]: (state, payload) => (state.userTransactions = payload)
 }
 
 export default mutations

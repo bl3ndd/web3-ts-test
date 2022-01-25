@@ -1,23 +1,9 @@
-import Token from '~/classes/Token'
-
-export interface ITokensMap {
-  [key: string]: Token;
-}
-
-export interface ITokenState {
-  tokensMap: ITokensMap
-  userBalances: Array<IUserBalance>
-  userAllowance: string
-}
-
-export interface IUserBalance {
-  [key: string]: string
-}
+import { ITokenState } from "~/store/token/types";
 
 export const initState = (): ITokenState => ({
-  tokensMap: {},
   userBalances: [],
-  userAllowance: '',
+  userAllowance: 0,
+  userTransactions: [],
 })
 
 export default initState

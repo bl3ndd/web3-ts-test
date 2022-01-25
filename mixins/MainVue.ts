@@ -8,6 +8,6 @@ export default Vue.extend({
     },
     SetLoader (value: boolean) {
       this.$store.dispatch('loader/setLoading', value)
-    }
+    },
   }
 })

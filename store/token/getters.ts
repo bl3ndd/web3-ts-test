@@ -1,19 +1,20 @@
 import { GetterTree } from 'vuex'
-import {ITokensMap, ITokenState, IUserBalance} from '~/store/token/state'
+import {ArrayOfUserBalance, ITokenState, ITransaction} from '~/store/token/types'
 
-export interface ITokenGetter {
-  getTokensMap: ITokensMap;
-  getTokensKeys: string[];
-  getDecimalsByAddress: (address: string) => string
+export interface ITokenGetters<S = ITokenState> {
+  getUserBalances(state: S): ArrayOfUserBalance,
+  getUserAllowance(state: S): number,
+  getUserTransactions(state: S): Array<ITransaction>,
 }
 
-const getters: GetterTree<ITokenState, ITokenState> = {
-  getTokensMap: (state): ITokensMap => state.tokensMap,
-  getTokensKeys: (state): Array<string> => Object.keys(state.tokensMap),
-  getDecimalsByAddress: state => (address: string): string => (state.tokensMap[address].decimals || ''),
+export type TokenGetterReturnTypes = {
+  [F in keyof ITokenGetters]: ReturnType<(ITokenGetters[F])>
+}
 
-  getUserBalances: (state): Array<IUserBalance> => state.userBalances,
-  getUserAllowance: (state): string => state.userAllowance
+const getters: GetterTree<ITokenState, ITokenGetters> & ITokenGetters = {
+  getUserBalances: (state) => state.userBalances,
+  getUserAllowance: (state) => state.userAllowance,
+  getUserTransactions: (state) => state.userTransactions,
 }
 
 export default getters

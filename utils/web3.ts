@@ -16,8 +16,6 @@ let chainId: number
 
 BigNumber.config({ EXPONENTIAL_AT: 60 })
 
-let pingTimer: any
-
 export const fetchContractData = async (method: string, abi: Array<any>, address: string, params?: Array<any>): Promise<any> => {
   try {
     const contract = new web3Guest.eth.Contract(abi, address)
@@ -32,41 +30,6 @@ export const createInst = async (abi: Array<any>, address: string): Promise<any>
   const abs = web4.getContractAbstraction(abi)
   return await abs.getInstance(address)
 }
-
-// export const startPingingMetamask = (callback: any): IResponse => {
-//   try {
-//     if (web3Wallet === undefined) {
-//       return error(500, 'pingingMetamask err')
-//     }
-//     const referenceAddress = userAddress
-//     const referenceChainId = chainId
-//     clearInterval(pingTimer)
-//     pingTimer = setInterval(async () => {
-//       const address = await web3Wallet.eth.getCoinbase()
-//       const localChainId = await web3Wallet.eth.net.getId()
-//       if (address !== referenceAddress || localChainId !== referenceChainId) {
-//         chainId = -1
-//         userAddress = ''
-//         callback()
-//         clearInterval(pingTimer)
-//       }
-//     }, 2000)
-//     return output()
-//   } catch (err) {
-//     return error(500, 'pingingMetamask err', err)
-//   }
-// }
-
-// export const example1 = async (): Promise<IResponse> => {
-//   const r = await fetchContractData(
-//     'balanceOf',
-//     ERC20,
-//     '0x4b107a23361770534bd1839171bbf4b0eb56485c',
-//     ['0xBC6ae91F55af580B4C0E8c32D7910d00D3dbe54d']
-//   )
-//   console.log('balanceOf', r)
-//   return output(r)
-// }
 
 export const connectNode = (): IResponse => {
   try {
@@ -149,6 +112,30 @@ export const getDecimals = async (address: string): Promise<any> => {
     const resp = await fetchContractData('decimals', ERC20, address);
     return resp
 }
+
+export const fetchTransactionHistory = async (token: string, symbol: string, decimals: string) => {
+  const Contract = new web3Wallet.eth.Contract(ERC20, token);
+  const history = await Contract.getPastEvents('AllEvents', { fromBlock: 0, toBlock: 'latest' });
+  const transactions = []
+  for (let item of history) {
+    const owner = item.returnValues?.owner?.toLowerCase() || '';
+    const spender = item.returnValues?.spender?.toLowerCase() || '';
+    const from = item.returnValues?.from?.toLowerCase() || '';
+    const to = item.returnValues?.to?.toLowerCase() || '';
+    if (from.toLowerCase() === userAddress || to.toLowerCase() === userAddress
+      || owner.toLowerCase() === userAddress || spender.toLowerCase() === userAddress
+    ) {
+      transactions.push({
+        type: item.event,
+        from: item.returnValues.from || item.returnValues.owner,
+        to: item.returnValues.to || item.returnValues.spender,
+        amount: new BigNumber(item.returnValues.value).shiftedBy(-decimals).toString(),
+        symbol,
+      });
+    }
+  }
+  return transactions;
+};
 
 export const getWeb3 = (): any => web3Wallet || web3Guest
 

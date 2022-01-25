@@ -15,7 +15,21 @@ const actions: ActionTree<IModalsState, IModalsState> = {
   },
   setUnclicable ({ commit }) {
     commit('SET_UNCLOSABLE')
-  }
+  },
+  showToast(_, value) {
+    // @ts-ignore
+    const codeText = value?.code ? $nuxt.$t(`toasts.errors.${value.code}`) : $nuxt.$t('toasts.errors.0');
+    // @ts-ignore
+    this._vm.$bvToast.toast(value?.text || codeText, {
+      // @ts-ignore
+      title: value.title || 'Error',
+      variant: value.variant || 'danger',
+      solid: true,
+      toaster: value.toaster || 'b-toaster-bottom-right',
+      appendToast: value.appendToast || false,
+      autoHideDelay: value.delay || 5000,
+    });
+  },
 }
 
 export default actions
