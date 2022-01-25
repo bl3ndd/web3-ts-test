@@ -19,10 +19,10 @@ BigNumber.config({ EXPONENTIAL_AT: 60 })
 export const fetchContractData = async (method: string, abi: Array<any>, address: string, params?: Array<any>): Promise<any> => {
   try {
     const contract = new web3Guest.eth.Contract(abi, address)
-    return await contract.methods[method].apply(this, params).call()
+    const resp = await contract.methods[method].apply(this, params).call()
+    return output(resp)
   } catch (e) {
-    console.log(e)
-    return ''
+    return error(0)
   }
 }
 
@@ -48,14 +48,18 @@ export const connectNode = (): IResponse => {
 }
 
 export const sendTransaction = async (method: string, abi: any[], address: string, params?: string[]): Promise<any> => {
-  const inst = new web3Wallet.eth.Contract(abi, address)
-  const data = inst.methods[method].apply(null, params).encodeABI()
-  const r = await web3Wallet.eth.sendTransaction({
-    to: address,
-    data,
-    from: userAddress
-  })
-  return r
+  try {
+    const inst = new web3Wallet.eth.Contract(abi, address)
+    const data = inst.methods[method].apply(null, params).encodeABI()
+    const r = await web3Wallet.eth.sendTransaction({
+      to: address,
+      data,
+      from: userAddress
+    })
+    return output(r)
+  } catch (e) {
+    return error(0)
+  }
 }
 
 export const connectWallet = async (): Promise<IResponse> => {
@@ -104,37 +108,48 @@ export const getFee = async (method: string, abi: Array<any>, address: string, p
 }
 
 export const getBalance = async (address: string, userAddress: string): Promise<any> => {
-    const resp = await fetchContractData('balanceOf', ERC20, address, [userAddress]);
-    return resp;
+  // try catch не нужен т.к. здесь нет никаких вызовов, а ошибка обработается в fetchContractData
+  const resp = await fetchContractData('balanceOf', ERC20, address, [userAddress]);
+  if (resp.ok) {
+    return output(resp.result)
+  }
+  return error(0)
 }
 
 export const getDecimals = async (address: string): Promise<any> => {
-    const resp = await fetchContractData('decimals', ERC20, address);
-    return resp
+  const resp = await fetchContractData('decimals', ERC20, address);
+  if(resp.ok) {
+    return output(resp.result)
+  }
+  return error(0)
 }
 
 export const fetchTransactionHistory = async (token: string, symbol: string, decimals: string) => {
-  const Contract = new web3Wallet.eth.Contract(ERC20, token);
-  const history = await Contract.getPastEvents('AllEvents', { fromBlock: 0, toBlock: 'latest' });
-  const transactions = []
-  for (let item of history) {
-    const owner = item.returnValues?.owner?.toLowerCase() || '';
-    const spender = item.returnValues?.spender?.toLowerCase() || '';
-    const from = item.returnValues?.from?.toLowerCase() || '';
-    const to = item.returnValues?.to?.toLowerCase() || '';
-    if (from.toLowerCase() === userAddress || to.toLowerCase() === userAddress
-      || owner.toLowerCase() === userAddress || spender.toLowerCase() === userAddress
-    ) {
-      transactions.push({
-        type: item.event,
-        from: item.returnValues.from || item.returnValues.owner,
-        to: item.returnValues.to || item.returnValues.spender,
-        amount: new BigNumber(item.returnValues.value).shiftedBy(-decimals).toString(),
-        symbol,
-      });
+  try {
+    const Contract = new web3Wallet.eth.Contract(ERC20, token);
+    const history = await Contract.getPastEvents('AllEvents', { fromBlock: 0, toBlock: 'latest' });
+    const transactions = []
+    for (let item of history) {
+      const owner = item.returnValues?.owner?.toLowerCase() || '';
+      const spender = item.returnValues?.spender?.toLowerCase() || '';
+      const from = item.returnValues?.from?.toLowerCase() || '';
+      const to = item.returnValues?.to?.toLowerCase() || '';
+      if (from.toLowerCase() === userAddress || to.toLowerCase() === userAddress
+        || owner.toLowerCase() === userAddress || spender.toLowerCase() === userAddress
+      ) {
+        transactions.push({
+          type: item.event,
+          from: item.returnValues.from || item.returnValues.owner,
+          to: item.returnValues.to || item.returnValues.spender,
+          amount: new BigNumber(item.returnValues.value).shiftedBy(-decimals).toString(),
+          symbol,
+        });
+      }
     }
+    return output(transactions);
+  } catch (e) {
+    return error(0)
   }
-  return transactions;
 };
 
 export const getWeb3 = (): any => web3Wallet || web3Guest

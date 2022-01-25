@@ -1,5 +1,5 @@
 import { ActionTree, Commit, Dispatch } from 'vuex'
-import { ITokenState } from '~/store/token/types'
+import {ITokenState, IUserBalances, TokenMutations} from '~/store/token/types'
 import { getBalance, getUserAddress, fetchContractData, sendTransaction, getDecimals, fetchTransactionHistory } from '~/utils/web3'
 import { shiftedBy } from '~/utils'
 import { ERC20 } from '~/utils/abis'
@@ -18,39 +18,49 @@ export interface ITokenActions<C = Commit, D = Dispatch, G = TokenGetterReturnTy
 const actions: ActionTree<ITokenState, ITokenState> & ITokenActions = {
   async getUserBalances({ commit, dispatch }) {
     try {
-      const balances = []
+      const balances: IUserBalances = {}
       for (let token of TOKENS) {
-        const balance = await getBalance(token.address, 'getUserAddress()');
-        const decimals = await getDecimals(token.address);
-        balances.push({
-          ...token,
-          balance: shiftedBy(balance, decimals),
-          decimals
-        })
+        const resp = await getBalance(token.address, getUserAddress());
+        if(!resp.ok) {
+          dispatch('modals/showToast', {text: 'Error'}, {root: true})
+          return error(0)
+        }
+        balances[token.symbol] = shiftedBy(resp.result, token.decimals)
       }
-      commit('SET_USER_BALANCES', balances)
-    } catch (error) {
-      dispatch('modals/showToast', { text: 'Error' }, { root: true })
+      commit(TokenMutations.SET_USER_BALANCES, balances)
+    } catch (e) {
+      return error(0)
     }
   },
 
   async fetchUserAllowance({ commit }, { contractAddress, spenderAddress }) {
     const resp = await fetchContractData('allowance', ERC20, contractAddress, [getUserAddress(), spenderAddress]);
-    commit('SET_USER_ALLOWANCE', resp)
+    if (resp.ok) {
+      commit(TokenMutations.SET_USER_ALLOWANCE, resp)
+    }
   },
 
   async approve({ commit, dispatch }, { tokenAddress, spender, amount }) {
-    await sendTransaction('approve', ERC20, tokenAddress, [spender, amount]);
+    const resp = await sendTransaction('approve', ERC20, tokenAddress, [spender, amount]);
+    if (!resp.ok) {
+      dispatch('modals/showToast', {text: 'Error'}, {root: true})
+    }
   },
 
   async transfer({ commit, dispatch }, { tokenAddress, recipient, amount }) {
-    await sendTransaction('transfer', ERC20, tokenAddress, [recipient, amount]);
+    const resp = await sendTransaction('transfer', ERC20, tokenAddress, [recipient, amount]);
+    if (!resp.ok) {
+      dispatch('modals/showToast', {text: 'Error'}, {root: true})
+    }
   },
 
-  async getTransactions({ commit }, { address, symbol, decimals }) {
-    console.log(address, symbol, decimals);
-    const transactions = await fetchTransactionHistory(address, symbol, decimals)
-    commit('SET_USER_TRANSACTIONS', transactions)
+  async getTransactions({ commit, dispatch }, { address, symbol, decimals }) {
+    const resp = await fetchTransactionHistory(address, symbol, decimals)
+    if(resp.ok) {
+      commit(TokenMutations.SET_USER_TRANSACTIONS, resp.result)
+    } else {
+      dispatch('modals/showToast', {text: 'Error'}, {root: true})
+    }
   }
 }
 

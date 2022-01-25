@@ -17,7 +17,7 @@
           <b-form-select-option :value="null" disabled>-- Please select a token --</b-form-select-option>
         </template>
         <b-form-select-option
-          v-for="token in userBalances"
+          v-for="token in TOKENS"
           :key="token.address"
           :value="token"
         >
@@ -35,7 +35,7 @@
     </b-input-group>
     <div class="content__text text">
       <span class="text__title">Your balance:</span>
-      <span class="text__value">{{ selectedToken.balance }} {{ selectedToken.name }}</span>
+      <span class="text__value">{{ userBalances[selectedToken.symbol] }} {{ selectedToken.name }}</span>
     </div>
     <div class="content__text text">
       <span class="text__title">Your Allowance:</span>
@@ -135,22 +135,24 @@ export default MainVue.extend({
       approveAction: 'token/approve',
       transferAction: 'token/transfer',
       fetchTransactionsAction: 'token/getTransactions',
+      getUserBalances: 'token/getUserBalances',
     }),
-    approve() {
+    async approve() {
       this.SetLoader(true)
       const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
-      this.approveAction({ tokenAddress: this.selectedToken.address ,spender: this.recipientAddress, amount })
+      await this.approveAction({ tokenAddress: this.selectedToken.address ,spender: this.recipientAddress, amount })
       this.SetLoader(false)
     },
-    fetchUserAllowance() {
+    async fetchUserAllowance() {
       this.SetLoader(true)
-      this.fetchUserAllowanceAction({ contractAddress: this.selectedToken.address, spenderAddress: this.recipientAddress })
+      await this.fetchUserAllowanceAction({ contractAddress: this.selectedToken.address, spenderAddress: this.recipientAddress })
       this.SetLoader(false)
     },
-    transfer() {
+    async transfer() {
       this.SetLoader(true)
       const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
-      this.transferAction({ tokenAddress: this.selectedToken.address, recipient: this.recipientAddress, amount })
+      await this.transferAction({ tokenAddress: this.selectedToken.address, recipient: this.recipientAddress, amount })
+      await this.getUserBalances()
       this.SetLoader(false)
     },
     async fetchTransaction(selectedToken: IUserToken) {

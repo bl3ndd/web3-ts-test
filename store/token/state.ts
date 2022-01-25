@@ -1,7 +1,7 @@
 import { ITokenState } from "~/store/token/types";
 
 export const initState = (): ITokenState => ({
-  userBalances: [],
+  userBalances: {},
   userAllowance: 0,
   userTransactions: [],
 })

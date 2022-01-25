@@ -1,9 +1,9 @@
 import { MutationTree } from 'vuex'
-import {ITokenState, IUserBalance, ITransaction} from '~/store/token/types'
+import {ITokenState, IUserBalance, ITransaction, IUserBalances} from '~/store/token/types'
 import { TokenMutations } from '@/store/token/types'
 
 export interface ITokenMutations<S = ITokenState> {
-  [TokenMutations.SET_USER_BALANCES](state: S, payload: Array<IUserBalance>): void,
+  [TokenMutations.SET_USER_BALANCES](state: S, payload: IUserBalances): void,
   [TokenMutations.SET_USER_ALLOWANCE](state: S, payload: number): void,
   [TokenMutations.SET_USER_TRANSACTIONS](state: S, payload: Array<ITransaction>): void,
 }

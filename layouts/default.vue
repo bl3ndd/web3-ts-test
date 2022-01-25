@@ -23,7 +23,7 @@
 </template>
 <script lang="ts">
 import MainVue from '~/mixins/MainVue'
-import { connectWallet } from "~/utils/web3";
+import { connectWallet, getUserAddress } from "~/utils/web3";
 import {mapActions, mapGetters} from "vuex";
 
 export default MainVue.extend({
@@ -36,6 +36,7 @@ export default MainVue.extend({
     ...mapActions({
       getUserBalances: 'token/getUserBalances',
     }),
+    getUserAddress,
     async connectMetamaskWallet() {
         await connectWallet();
         await this.getUserBalances();

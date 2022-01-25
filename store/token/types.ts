@@ -4,10 +4,14 @@ export interface IUserBalance {
   balance: number,
 }
 
+export interface IUserBalances {
+  [key: string]: string
+}
+
 export type ArrayOfUserBalance = Array<IUserBalance>
 
 export interface ITokenState {
-  userBalances: Array<IUserBalance>
+  userBalances: IUserBalances
   userAllowance: number
   userTransactions: Array<ITransaction>
 }
