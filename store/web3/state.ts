@@ -1,9 +1,11 @@
 export interface IWeb3State {
-  isConnected: boolean,
+  isWalletConnected: boolean,
+  userWallet: string,
 }
 
 export const initState = (): IWeb3State => ({
-  isConnected: false
+  isWalletConnected: false,
+  userWallet: ''
 })
 
 export default initState

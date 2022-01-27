@@ -10,8 +10,8 @@ import { error } from "~/utils";
 export interface ITokenActions<C = Commit, D = Dispatch, G = TokenGetterReturnTypes> {
   getUserBalances({ commit, dispatch }: { commit: C, dispatch: D }): void
   fetchUserAllowance({ commit }: { commit: C }, payload: { contractAddress: string, spenderAddress: string }): void
-  approve({ commit, dispatch }: { commit: C, dispatch: D }, payload: { tokenAddress: string, spender: string, amount: string }): Promise<any> // TODO интерфейс для ответа
-  transfer({ commit, dispatch }: { commit: C, dispatch: D }, payload: { tokenAddress: string, recipient: string, amount: string }): Promise<any> // TODO интерфейс для ответа
+  approve({ commit, dispatch }: { commit: C, dispatch: D }, payload: { tokenAddress: string, spender: string, amount: string }): Promise<any>
+  transfer({ commit, dispatch }: { commit: C, dispatch: D }, payload: { tokenAddress: string, recipient: string, amount: string }): Promise<any>
   getTransactions({ commit, dispatch }: { commit: C, dispatch: D }, payload: { address: string, symbol: string, decimals: string }): void
 }
 

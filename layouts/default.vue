@@ -4,9 +4,16 @@
       <div class="template__header header">
         <div class="header__button">
           <b-button
+            v-if="!isWalletConnected"
             @click="connectMetamaskWallet"
           >
             Connect Wallet
+          </b-button>
+          <b-button
+            v-else
+            @click="disconnectUserWallet"
+          >
+            Disconnect Wallet
           </b-button>
         </div>
       </div>
@@ -23,22 +30,31 @@
 </template>
 <script lang="ts">
 import MainVue from '~/mixins/MainVue'
-import { connectWallet, getUserAddress } from "~/utils/web3";
-import {mapActions, mapGetters} from "vuex";
+import { getUserAddress } from "~/utils/web3";
+import { mapActions, mapGetters } from 'vuex';
 
 export default MainVue.extend({
   computed: {
     ...mapGetters({
       userBalances: 'token/getUserBalances',
+      userAddress: 'web3/getUserWallet',
+      isWalletConnected: 'web3/getIsConnected'
     })
+  },
+  async mounted() {
+    await this.checkWalletConnection()
   },
   methods: {
     ...mapActions({
       getUserBalances: 'token/getUserBalances',
+      connectWallet: 'web3/connectWallet',
+      checkWalletConnection: 'web3/checkWalletConnection',
+      disconnectUserWallet: 'web3/disconnectUserWallet'
     }),
     getUserAddress,
     async connectMetamaskWallet() {
-        await connectWallet();
+        await this.connectWallet();
+        await this.checkWalletConnection()
         await this.getUserBalances();
     },
   },

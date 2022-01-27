@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import {output, error, IResponse, shiftedBy} from '~/utils/index'
 import { ERC20 } from '~/utils/abis'
 import {TOKENS} from "~/utils/constants";
+import {createLogger} from "vuex";
 
 const { IS_MAINNET } = process.env
 
@@ -62,7 +63,18 @@ export const sendTransaction = async (method: string, abi: any[], address: strin
   }
 }
 
-export const connectWallet = async (): Promise<IResponse> => {
+// export const checkWalletConnection = async () => {
+//   try {
+//     // @ts-ignore
+//     const { ethereum } = window
+//     const isWalletConnected = await ethereum.isConnected();
+//     return output(isWalletConnected)
+//   } catch (e) {
+//     return error(0, 'some error')
+//   }
+// }
+
+export const fetchUserAddress = async (): Promise<IResponse> => {
   try {
     // @ts-ignore
     const { ethereum } = window
@@ -71,7 +83,18 @@ export const connectWallet = async (): Promise<IResponse> => {
     }
     web3Wallet = new Web3(ethereum)
     userAddress = await web3Wallet.eth.getCoinbase()
-    if (userAddress === null) {
+
+    return output({ userAddress, ethereum });
+  } catch (e) {
+    return error(0, 'error while wallet connection')
+  }
+}
+
+export const connectWallet = async (): Promise<IResponse> => {
+  try {
+    const r = await fetchUserAddress();
+    const { ethereum } = r.result;
+    if (!userAddress) {
       await ethereum.enable()
       userAddress = await web3Wallet.eth.getCoinbase()
     }
@@ -84,9 +107,20 @@ export const connectWallet = async (): Promise<IResponse> => {
     web4 = new Web4()
     web4.setProvider(ethereum, userAddress)
 
-    return output({ userAddress })
+    return output(userAddress)
   } catch (err) {
     return error(4001, 'connection error', err)
+  }
+}
+
+export const disconnectWallet = () => {
+  try {
+    web3Wallet = undefined
+    userAddress = ''
+    console.log(web3Wallet, userAddress)
+    return output()
+  } catch (e) {
+    return error(0, 'some error')
   }
 }
 
