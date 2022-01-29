@@ -1,65 +1,94 @@
 <template>
   <div class="content">
-    <div class="content__wrapper">
-      <b-input-group
-        class="content__input"
-        prepend="Amount"
-      >
-        <b-form-input
-          v-model="amount"
-        />
-      </b-input-group>
-      <b-form-select
-        v-model="selectedToken"
-        @change="fetchTransaction(selectedToken)"
-      >
-        <template #first>
-          <b-form-select-option :value="null" disabled>-- Please select a token --</b-form-select-option>
-        </template>
-        <b-form-select-option
-          v-for="token in TOKENS"
-          :key="token.address"
-          :value="token"
-        >
-          {{ token.symbol }}
-        </b-form-select-option>
-      </b-form-select>
-    </div>
-    <b-input-group
-      class="content__input content__input_mb-40"
-      prepend="Address (recipient)"
+    <validation-observer
+      v-slot="{ handleSubmit }"
     >
-      <b-form-input
-        v-model="recipientAddress"
-      />
-    </b-input-group>
-    <div class="content__text text">
-      <span class="text__title">Your balance:</span>
-      <span class="text__value">{{ userBalances[selectedToken.symbol] }} {{ selectedToken.name }}</span>
-    </div>
-    <div class="content__text text">
-      <span class="text__title">Your Allowance:</span>
-      <span class="text__value">{{ userAllowance }}</span>
-    </div>
-    <div class="content__buttons">
-      <b-button
-        @click="fetchUserAllowance"
+      <div class="content__wrapper">
+        <validation-provider
+          rules="numeric|required"
+          name="Amount"
+          v-slot="{ errors }"
+        >
+          <b-form-input
+            v-model="amount"
+            placeholder="Enter amount of tokens"
+          />
+          <span
+            class="content__error"
+          >
+          {{ errors[0] }}
+        </span>
+        </validation-provider>
+        <validation-provider
+
+        >
+          <b-form-select
+            v-model="selectedToken"
+            @change="fetchTransaction(selectedToken)"
+          >
+            <template #first>
+              <b-form-select-option :value="{}" disabled>-- Please select a token --</b-form-select-option>
+            </template>
+            <b-form-select-option
+              v-for="token in TOKENS"
+              :key="token.address"
+              :value="token"
+            >
+              {{ token.symbol || '' }}
+            </b-form-select-option>
+          </b-form-select>
+        </validation-provider>
+      </div>
+      <validation-provider
+        rules="validAddress|required"
+        name="Recipient address"
+        v-slot="{ errors }"
       >
-        Get Allowance
-      </b-button>
-      <b-button
-        @click="approve"
-      >
-        Approve</b-button>
-      <b-button
-        @click="transfer"
-      >Transfer</b-button>
-    </div>
+        <div class="content__field">
+          <b-form-input
+            placeholder="Enter the recipient address"
+            v-model="recipientAddress"
+          />
+          <span class="content__error">
+          {{ errors[0] }}
+        </span>
+        </div>
+      </validation-provider>
+      <div class="content__text text">
+        <span class="text__title">Your balance:</span>
+        <span class="text__value">{{ userBalances[selectedToken.symbol] || 0 }} {{ selectedToken.name }}</span>
+      </div>
+      <div class="content__text text">
+        <span class="text__title">Your Allowance:</span>
+        <span class="text__value">{{ userAllowance }}</span>
+      </div>
+      <div class="content__buttons">
+        <b-button
+          @click="handleSubmit(fetchUserAllowance)"
+        >
+          Get Allowance
+        </b-button>
+        <b-button
+          @click="handleSubmit(approve)"
+        >
+          Approve
+        </b-button>
+        <b-button
+          @click="handleSubmit(transfer)"
+        >
+          Transfer
+        </b-button>
+      </div>
+    </validation-observer>
     <div class="content__transactions transactions">
-      <div class="transactions__title">
+      <div
+        class="transactions__title">
         Your Transactions
       </div>
-      <div class="transactions__table table">
+      <div
+        v-if="userTransactions.length"
+        class="transactions__table table"
+      >
         <div
           v-for="(transaction, index) in userTransactions"
           :key="index"
@@ -97,6 +126,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-else>
+        You don't have transactions
       </div>
     </div>
   </div>
@@ -140,18 +172,30 @@ export default MainVue.extend({
     async approve() {
       this.SetLoader(true)
       const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
-      await this.approveAction({ tokenAddress: this.selectedToken.address ,spender: this.recipientAddress, amount })
+      await this.approveAction({
+        tokenAddress: this.selectedToken.address,
+        spender: this.recipientAddress,
+        amount
+      })
       this.SetLoader(false)
     },
     async fetchUserAllowance() {
       this.SetLoader(true)
-      await this.fetchUserAllowanceAction({ contractAddress: this.selectedToken.address, spenderAddress: this.recipientAddress })
+      await this.fetchUserAllowanceAction({
+        contractAddress: this.selectedToken.address,
+        spenderAddress: this.recipientAddress,
+        decimals: this.selectedToken.decimals
+      })
       this.SetLoader(false)
     },
     async transfer() {
       this.SetLoader(true)
       const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
-      await this.transferAction({ tokenAddress: this.selectedToken.address, recipient: this.recipientAddress, amount })
+      await this.transferAction({
+        tokenAddress: this.selectedToken.address,
+        recipient: this.recipientAddress,
+        amount
+      })
       await this.getUserBalances()
       this.SetLoader(false)
     },
@@ -159,7 +203,7 @@ export default MainVue.extend({
       this.SetLoader(true)
       await this.fetchTransactionsAction(selectedToken)
       this.SetLoader(false)
-    }
+    },
   }
 });
 
@@ -167,6 +211,12 @@ export default MainVue.extend({
 <style lang="scss" scoped>
 .content {
   @include container;
+  &__error {
+    color: red;
+  }
+  &__field {
+    margin-bottom: 40px;
+  }
   &__input {
     &_mb-40 {
       margin-bottom: 40px;
@@ -182,7 +232,6 @@ export default MainVue.extend({
   &__wrapper {
     display: grid;
     grid-template-columns: 3fr 1fr;
-    align-items: center;
     margin: 10px 0 40px 0;
   }
   .transactions {

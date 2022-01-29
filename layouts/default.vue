@@ -5,13 +5,13 @@
         <div class="header__button">
           <b-button
             v-if="!isWalletConnected"
-            @click="connectMetamaskWallet"
+            @click="connectWallet"
           >
             Connect Wallet
           </b-button>
           <b-button
             v-else
-            @click="disconnectUserWallet"
+            @click="disconnectWallet"
           >
             Disconnect Wallet
           </b-button>
@@ -43,19 +43,24 @@ export default MainVue.extend({
   },
   async mounted() {
     await this.checkWalletConnection()
+    if (this.isWalletConnected) {
+      await this.getUserBalances();
+    }
   },
   methods: {
     ...mapActions({
       getUserBalances: 'token/getUserBalances',
-      connectWallet: 'web3/connectWallet',
+      connectWalletAction: 'web3/connectWallet',
       checkWalletConnection: 'web3/checkWalletConnection',
-      disconnectUserWallet: 'web3/disconnectUserWallet'
+      disconnectWallet: 'web3/disconnectWallet'
     }),
     getUserAddress,
-    async connectMetamaskWallet() {
-        await this.connectWallet();
-        await this.checkWalletConnection()
-        await this.getUserBalances();
+    async connectWallet() {
+      this.SetLoader(true);
+      await this.checkWalletConnection()
+      await this.connectWalletAction();
+      await this.getUserBalances();
+      this.SetLoader(false);
     },
   },
 })

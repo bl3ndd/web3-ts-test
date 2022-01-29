@@ -8,8 +8,6 @@ export interface IUserBalances {
   [key: string]: string
 }
 
-export type ArrayOfUserBalance = Array<IUserBalance>
-
 export interface ITokenState {
   userBalances: IUserBalances
   userAllowance: number

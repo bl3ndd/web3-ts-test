@@ -42,7 +42,7 @@ export const connectNode = (): IResponse => {
     }
     const provider = new Web3.providers.WebsocketProvider(bscUrl)
     web3Guest = new Web3(provider)
-    return output()
+    return output(web3Guest)
   } catch (e) {
     return error(500, 'connection error', e)
   }
@@ -62,17 +62,6 @@ export const sendTransaction = async (method: string, abi: any[], address: strin
     return error(0)
   }
 }
-
-// export const checkWalletConnection = async () => {
-//   try {
-//     // @ts-ignore
-//     const { ethereum } = window
-//     const isWalletConnected = await ethereum.isConnected();
-//     return output(isWalletConnected)
-//   } catch (e) {
-//     return error(0, 'some error')
-//   }
-// }
 
 export const fetchUserAddress = async (): Promise<IResponse> => {
   try {
@@ -117,7 +106,6 @@ export const disconnectWallet = () => {
   try {
     web3Wallet = undefined
     userAddress = ''
-    console.log(web3Wallet, userAddress)
     return output()
   } catch (e) {
     return error(0, 'some error')
@@ -191,3 +179,5 @@ export const getWeb3 = (): any => web3Wallet || web3Guest
 export const getUserAddress = (): string => userAddress
 
 export const getChainId = (): number => chainId
+
+export const isValidAddress = (address: string): boolean => web3Wallet.utils.isAddress(address)

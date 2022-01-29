@@ -1,12 +1,17 @@
-import {ActionTree, createLogger} from 'vuex'
+import { ActionTree, Commit, Dispatch } from 'vuex'
 import { IWeb3State } from '~/store/web3/state'
-import {connectNode, connectWallet, disconnectWallet, fetchUserAddress} from '~/utils/web3'
-import {Web3Mutations} from "~/store/web3/types";
+import { connectNode, connectWallet, disconnectWallet, fetchUserAddress } from '~/utils/web3'
+import { Web3Mutations } from "~/store/web3/types";
+
+export interface IWeb3Actions<C = Commit, D = Dispatch> {
+  connectNode(): void,
+  checkWalletConnection({ commit }: { commit: C } ): string,
+  disconnectWallet({ commit, dispatch }: { commit: C, dispatch: D } ): string,
+}
 
 const actions: ActionTree<IWeb3State, IWeb3State> = {
-  async connectNode ({ dispatch }) {
+  async connectNode () {
     const r = connectNode()
-    await dispatch('token/fetchCommonDataToken', null, { root: true })
     return r
   },
   async connectWallet ({ commit }) {
@@ -23,11 +28,15 @@ const actions: ActionTree<IWeb3State, IWeb3State> = {
     if (r.ok && r.result.userAddress) {
       commit(Web3Mutations.SET_IS_WALLET_CONNECTED, true)
     }
+    return r.result.userAddress
   },
-  async disconnectUserWallet({ commit }) {
+  async disconnectWallet({ commit, dispatch }) {
     const r = await disconnectWallet()
     if (r.ok) {
       commit(Web3Mutations.SET_USER_WALLET, '')
+      commit(Web3Mutations.SET_IS_WALLET_CONNECTED, false)
+      dispatch('token/resetUserBalances', null, { root: true })
+      dispatch('token/resetTransactions', null, { root: true })
     }
   }
 }

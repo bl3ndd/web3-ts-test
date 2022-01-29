@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { isValidAddress } from '~/utils/web3';
 
 import {
   ValidationProvider,
@@ -25,5 +26,14 @@ Object.keys(rules).forEach((rule) => {
 export default ({ app }) => {
   configure({
     defaultMessage: (_field_, values) => app.i18n.t(`messages.${values._rule_}`, values)
+  })
+
+  extend('validAddress', {
+    validate: (address) => {
+      const isValid = isValidAddress(address)
+      return {
+        valid: isValid
+      }
+    }
   })
 }
