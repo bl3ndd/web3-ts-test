@@ -114,7 +114,7 @@ export default {
     },
   },
   computed: {
-    fieldClass() {
+    fieldClass(): any {
       const {
         isButton,
         isShadow,
