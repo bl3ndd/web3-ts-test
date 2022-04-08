@@ -1,10 +1,11 @@
-import { ActionTree, Commit, Dispatch } from 'vuex'
-import {ITokenState, IUserBalances, TokenMutations} from '~/store/token/types'
-import { getBalance, getUserAddress, fetchContractData, sendTransaction, fetchTransactionHistory } from '~/utils/web3'
-import { shiftedBy } from '~/utils'
-import { ERC20 } from '~/utils/abis'
+import { ActionTree, Commit, Dispatch } from 'vuex';
+import { ITokenState, IUserBalances, TokenMutations } from '~/store/token/types';
+import {
+  getBalance, getUserAddress, fetchContractData, sendTransaction, fetchTransactionHistory,
+} from '~/utils/web3';
+import { shiftedBy, error } from '~/utils';
+import { ERC20 } from '~/utils/abis';
 import { TOKENS } from '~/utils/constants';
-import { error } from "~/utils";
 
 export interface ITokenActions<C = Commit, D = Dispatch> {
   getUserBalances({ commit, dispatch }: { commit: C, dispatch: D }): void
@@ -19,23 +20,23 @@ export interface ITokenActions<C = Commit, D = Dispatch> {
 const actions: ActionTree<ITokenState, ITokenState> & ITokenActions = {
   async getUserBalances({ commit, dispatch }) {
     try {
-      const balances: IUserBalances = {}
-      for (let token of TOKENS) {
+      const balances: IUserBalances = {};
+      for (const token of TOKENS) {
         const resp = await getBalance(token.address, getUserAddress());
-        if(!resp.ok) {
-          dispatch('modals/showToast', {text: 'You need to connect your wallet'}, {root: true})
-          return error(0)
+        if (!resp.ok) {
+          dispatch('modals/showToast', { text: 'You need to connect your wallet' }, { root: true });
+          return error(0);
         }
-        balances[token.symbol] = shiftedBy(resp.result, token.decimals)
+        balances[token.symbol] = shiftedBy(resp.result, token.decimals);
       }
-      commit(TokenMutations.SET_USER_BALANCES, balances)
+      commit(TokenMutations.SET_USER_BALANCES, balances);
     } catch (e) {
-      return error(0)
+      return error(0);
     }
   },
 
   resetUserBalances({ commit }) {
-    commit(TokenMutations.SET_USER_BALANCES, {})
+    commit(TokenMutations.SET_USER_BALANCES, {});
   },
 
   async fetchUserAllowance({ commit }, { contractAddress, spenderAddress, decimals }) {
@@ -48,29 +49,29 @@ const actions: ActionTree<ITokenState, ITokenState> & ITokenActions = {
   async approve({ commit, dispatch }, { tokenAddress, spender, amount }) {
     const resp = await sendTransaction('approve', ERC20, tokenAddress, [spender, amount]);
     if (!resp.ok) {
-      dispatch('modals/showToast', {text: 'Error'}, {root: true})
+      dispatch('modals/showToast', { text: 'Error' }, { root: true });
     }
   },
 
   async transfer({ commit, dispatch }, { tokenAddress, recipient, amount }) {
     const resp = await sendTransaction('transfer', ERC20, tokenAddress, [recipient, amount]);
     if (!resp.ok) {
-      dispatch('modals/showToast', {text: 'Error'}, {root: true})
+      dispatch('modals/showToast', { text: 'Error' }, { root: true });
     }
   },
 
   async getTransactions({ commit, dispatch }, { address, symbol, decimals }) {
-    const resp = await fetchTransactionHistory(address, symbol, decimals)
-    if(resp.ok) {
-      commit(TokenMutations.SET_USER_TRANSACTIONS, resp.result)
+    const resp = await fetchTransactionHistory(address, symbol, decimals);
+    if (resp.ok) {
+      commit(TokenMutations.SET_USER_TRANSACTIONS, resp.result);
     } else {
-      dispatch('modals/showToast', {text: 'You need to connect your wallet'}, {root: true})
+      dispatch('modals/showToast', { text: 'You need to connect your wallet' }, { root: true });
     }
   },
 
   resetTransactions({ commit }) {
-    commit(TokenMutations.SET_USER_TRANSACTIONS, [])
-  }
-}
+    commit(TokenMutations.SET_USER_TRANSACTIONS, []);
+  },
+};
 
-export default actions
+export default actions;

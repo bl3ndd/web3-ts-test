@@ -1,56 +1,56 @@
-import localeEn from './locales/en.json'
+import localeEn from './locales/en.json';
 
-require('dotenv').config()
+require('dotenv').config();
 
 export default {
   ssr: false,
   head: {
     title: 'frontend-starter-kit-2',
     htmlAttrs: {
-      lang: 'en'
+      lang: 'en',
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' }
+      { hid: 'description', name: 'description', content: '' },
     ],
     link: [
       // { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    ],
   },
   css: [
-    '@/assets/scss/main.scss'
+    '@/assets/scss/main.scss',
   ],
   styleResources: {
-    scss: ['./assets/scss/resourses.scss']
+    scss: ['./assets/scss/resourses.scss'],
   },
   components: true,
   buildModules: [
     '@nuxt/typescript-build',
-    '@nuxtjs/dotenv'
+    '@nuxtjs/dotenv',
   ],
   modules: [
     '@nuxtjs/style-resources',
     'bootstrap-vue/nuxt',
-    'nuxt-i18n'
+    'nuxt-i18n',
   ],
   plugins: [
-    { src: '@plugins/vee-validate.ts' }
+    { src: '@plugins/vee-validate.ts' },
   ],
   build: {
     transpile: [
-      'vee-validate/dist/rules'
+      'vee-validate/dist/rules',
     ],
     babel: {
       plugins: [
         ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
       ],
     },
-    extend (config) {
+    extend(config) {
       config.node = {
-        fs: 'empty'
-      }
-    }
+        fs: 'empty',
+      };
+    },
   },
   i18n: {
     locales: ['en'],
@@ -58,16 +58,16 @@ export default {
     strategy: 'no_prefix',
     vueI18n: {
       messages: {
-        en: localeEn
-      }
+        en: localeEn,
+      },
     },
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
-      alwaysRedirect: true
-    }
+      alwaysRedirect: true,
+    },
   },
   env: {
-    exampleValue: process.env.EXAMPLE_VALUE
-  }
-}
+    exampleValue: process.env.EXAMPLE_VALUE,
+  },
+};

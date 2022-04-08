@@ -3,17 +3,111 @@
   "extends": [
     "@nuxtjs/eslint-config-typescript",
     "plugin:@typescript-eslint/recommended",
-    "plugin:vue/recommended"
+    "plugin:vue/recommended",
+    "airbnb-base"
   ],
   "rules": {
-    "@typescript-eslint/explicit-function-return-type": ["error"],
-    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
-    "space-before-function-paren": ["error"],
-    "no-console": ["off"],
-    "vue/component-definition-name-casing": ["error", "kebab-case"],
-    "@typescript-eslint/no-explicit-any": ["off"],
-    "@typescript-eslint/ban-ts-comment": ["off"],
-    "@typescript-eslint/explicit-module-boundary-types": ["off"]
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "semi": [
+      "error"
+    ],
+    "@typescript-eslint/explicit-function-return-type": [
+      "error"
+    ],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "no-console": [
+      "off"
+    ],
+    "vue/component-definition-name-casing": [
+      "error",
+      "kebab-case"
+    ],
+    "@typescript-eslint/no-explicit-any": [
+      "off"
+    ],
+    "@typescript-eslint/ban-ts-comment": [
+      "off"
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": [
+      "off"
+    ],
+    "@typescript-eslint/no-var-requires": [
+      "off"
+    ],
+    "max-len": [
+      "off"
+    ],
+    "camelcase": [
+      "off"
+    ],
+    "no-underscore-dangle": [
+      "off"
+    ],
+    "import/extensions": [
+      "off"
+    ],
+    "import/no-unresolved": [
+      "off"
+    ],
+    "import/no-extraneous-dependencies": [
+      "off"
+    ],
+    "no-param-reassign": [
+      "off"
+    ],
+    "linebreak-style": [
+      "off"
+    ],
+    "no-async-promise-executor": [
+      "off"
+    ],
+    "no-return-await": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
+    ],
+    "import/no-dynamic-require": [
+      "off"
+    ],
+    "no-restricted-globals": [
+      "off"
+    ],
+    "no-unused-expressions": [
+      "off"
+    ],
+    "vue/no-template-shadow": [
+      "off"
+    ],
+    "no-shadow": [
+      "off"
+    ],
+    "global-require": [
+      "off"
+    ],
+    "no-await-in-loop": [
+      "off"
+    ],
+    "no-restricted-syntax": [
+      "off"
+    ]
   }
 }
 

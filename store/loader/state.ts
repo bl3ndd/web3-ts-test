@@ -7,7 +7,7 @@ export interface ILoaderState {
 export const initState = (): ILoaderState => ({
   isLoading: false,
   loaderStatusText: 'Loading',
-  isBgHider: true
-})
+  isBgHider: true,
+});
 
-export default initState
+export default initState;

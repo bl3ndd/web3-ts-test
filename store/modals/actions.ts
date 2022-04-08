@@ -1,20 +1,20 @@
-import { ActionTree } from 'vuex'
-import { IModalOptions, IModalsState } from '~/store/modals/state'
+import { ActionTree } from 'vuex';
+import { IModalOptions, IModalsState } from '~/store/modals/state';
 
 const actions: ActionTree<IModalsState, IModalsState> = {
-  show ({ commit }, payload: IModalOptions) {
-    console.log(payload)
-    commit('SET_IS_SHOW', true)
-    commit('SET_CURRENT_MODAL_KEY', payload.key)
-    commit('SET_OPTIONS', payload)
+  show({ commit }, payload: IModalOptions) {
+    console.log(payload);
+    commit('SET_IS_SHOW', true);
+    commit('SET_CURRENT_MODAL_KEY', payload.key);
+    commit('SET_OPTIONS', payload);
   },
-  hide ({ commit }) {
-    commit('SET_IS_SHOW', false)
-    commit('SET_CURRENT_MODAL_KEY', '')
-    commit('SET_OPTIONS', {})
+  hide({ commit }) {
+    commit('SET_IS_SHOW', false);
+    commit('SET_CURRENT_MODAL_KEY', '');
+    commit('SET_OPTIONS', {});
   },
-  setUnclicable ({ commit }) {
-    commit('SET_UNCLOSABLE')
+  setUnclicable({ commit }) {
+    commit('SET_UNCLOSABLE');
   },
   showToast(_, value) {
     // @ts-ignore
@@ -30,6 +30,6 @@ const actions: ActionTree<IModalsState, IModalsState> = {
       autoHideDelay: value.delay || 5000,
     });
   },
-}
+};
 
-export default actions
+export default actions;

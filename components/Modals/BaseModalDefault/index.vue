@@ -7,14 +7,14 @@
 </template>
 
 <script lang="ts">
-import { mapGetters } from 'vuex'
-import MainVue from '~/mixins/MainVue'
+import { mapGetters } from 'vuex';
+import MainVue from '~/mixins/MainVue';
 
 export default MainVue.extend({
   computed: {
     ...mapGetters({
-      options: 'modals/getOptions'
-    })
-  }
-})
+      options: 'modals/getOptions',
+    }),
+  },
+});
 </script>

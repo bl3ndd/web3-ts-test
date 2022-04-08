@@ -1,4 +1,4 @@
 export default {
   default: 'base-modal-default',
-  status: 'base-modal-status'
-}
+  status: 'base-modal-status',
+};

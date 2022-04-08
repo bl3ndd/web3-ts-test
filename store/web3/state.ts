@@ -5,7 +5,7 @@ export interface IWeb3State {
 
 export const initState = (): IWeb3State => ({
   isWalletConnected: false,
-  userWallet: ''
-})
+  userWallet: '',
+});
 
-export default initState
+export default initState;

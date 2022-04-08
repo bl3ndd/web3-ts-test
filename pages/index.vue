@@ -5,9 +5,9 @@
     >
       <div class="content__wrapper">
         <validation-provider
+          v-slot="{ errors }"
           rules="numeric|required"
           name="Amount"
-          v-slot="{ errors }"
         >
           <b-form-input
             v-model="amount"
@@ -16,18 +16,18 @@
           <span
             class="content__error"
           >
-          {{ errors[0] }}
-        </span>
+            {{ errors[0] }}
+          </span>
         </validation-provider>
-        <validation-provider
-
-        >
+        <validation-provider>
           <b-form-select
             v-model="selectedToken"
             @change="fetchTransaction(selectedToken)"
           >
             <template #first>
-              <b-form-select-option :value="{}" disabled>-- Please select a token --</b-form-select-option>
+              <b-form-select-option :value="{}" disabled>
+                -- Please select a token --
+              </b-form-select-option>
             </template>
             <b-form-select-option
               v-for="token in TOKENS"
@@ -40,18 +40,18 @@
         </validation-provider>
       </div>
       <validation-provider
+        v-slot="{ errors }"
         rules="validAddress|required"
         name="Recipient address"
-        v-slot="{ errors }"
       >
         <div class="content__field">
           <b-form-input
-            placeholder="Enter the recipient address"
             v-model="recipientAddress"
+            placeholder="Enter the recipient address"
           />
           <span class="content__error">
-          {{ errors[0] }}
-        </span>
+            {{ errors[0] }}
+          </span>
         </div>
       </validation-provider>
       <div class="content__text text">
@@ -82,7 +82,8 @@
     </validation-observer>
     <div class="content__transactions transactions">
       <div
-        class="transactions__title">
+        class="transactions__title"
+      >
         Your Transactions
       </div>
       <div
@@ -92,7 +93,8 @@
         <div
           v-for="(transaction, index) in userTransactions"
           :key="index"
-          class="table__row">
+          class="table__row"
+        >
           <div class="table__cell cell">
             <div class="cell__title cell__title_bold">
               Type
@@ -135,11 +137,11 @@
 </template>
 <script lang="ts">
 
-import { mapActions, mapGetters } from 'vuex'
-import MainVue from '~/mixins/MainVue'
-import { TOKENS } from '@/utils/constants.js'
+import { mapActions, mapGetters } from 'vuex';
+import MainVue from '~/mixins/MainVue';
+import { TOKENS } from '@/utils/constants.js';
 import { shiftedBy } from '~/utils';
-import { IUserToken } from "~/store/token/types";
+import { IUserToken } from '~/store/token/types';
 
 export default MainVue.extend({
   data: () => ({
@@ -149,15 +151,15 @@ export default MainVue.extend({
     selectedToken: {},
     recipientAddress: '',
   }),
-  async mounted () {
-    await this.connectNode()
+  async mounted() {
+    await this.connectNode();
   },
   computed: {
     ...mapGetters({
       userBalances: 'token/getUserBalances',
       userAllowance: 'token/getUserAllowance',
       userTransactions: 'token/getUserTransactions',
-    })
+    }),
   },
   methods: {
     ...mapActions({
@@ -170,41 +172,41 @@ export default MainVue.extend({
       getUserBalances: 'token/getUserBalances',
     }),
     async approve() {
-      this.SetLoader(true)
-      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
+      this.SetLoader(true);
+      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0);
       await this.approveAction({
         tokenAddress: this.selectedToken.address,
         spender: this.recipientAddress,
-        amount
-      })
-      this.SetLoader(false)
+        amount,
+      });
+      this.SetLoader(false);
     },
     async fetchUserAllowance() {
-      this.SetLoader(true)
+      this.SetLoader(true);
       await this.fetchUserAllowanceAction({
         contractAddress: this.selectedToken.address,
         spenderAddress: this.recipientAddress,
-        decimals: this.selectedToken.decimals
-      })
-      this.SetLoader(false)
+        decimals: this.selectedToken.decimals,
+      });
+      this.SetLoader(false);
     },
     async transfer() {
-      this.SetLoader(true)
-      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0)
+      this.SetLoader(true);
+      const amount = shiftedBy(this.amount, this.selectedToken.decimals, 0);
       await this.transferAction({
         tokenAddress: this.selectedToken.address,
         recipient: this.recipientAddress,
-        amount
-      })
-      await this.getUserBalances()
-      this.SetLoader(false)
+        amount,
+      });
+      await this.getUserBalances();
+      this.SetLoader(false);
     },
     async fetchTransaction(selectedToken: IUserToken) {
-      this.SetLoader(true)
-      await this.fetchTransactionsAction(selectedToken)
-      this.SetLoader(false)
+      this.SetLoader(true);
+      await this.fetchTransactionsAction(selectedToken);
+      this.SetLoader(false);
     },
-  }
+  },
 });
 
 </script>

@@ -16,8 +16,8 @@ export const initState = (): IModalsState => ({
   isShow: false,
   currentModalKey: '',
   options: {
-    key: ''
-  }
-})
+    key: '',
+  },
+});
 
-export default initState
+export default initState;

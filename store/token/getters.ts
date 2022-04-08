@@ -1,5 +1,5 @@
-import { GetterTree } from 'vuex'
-import { ITokenState, ITransaction, IUserBalances } from '~/store/token/types'
+import { GetterTree } from 'vuex';
+import { ITokenState, ITransaction, IUserBalances } from '~/store/token/types';
 
 export interface ITokenGetters<S = ITokenState> {
   getUserBalances(state: S): IUserBalances,
@@ -11,6 +11,6 @@ const getters: GetterTree<ITokenState, ITokenGetters> & ITokenGetters = {
   getUserBalances: (state) => state.userBalances,
   getUserAllowance: (state) => state.userAllowance,
   getUserTransactions: (state) => state.userTransactions,
-}
+};
 
-export default getters
+export default getters;

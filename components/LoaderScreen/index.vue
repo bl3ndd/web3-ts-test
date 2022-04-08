@@ -14,17 +14,17 @@
   </transition>
 </template>
 <script lang="ts">
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
-import MainVue from '~/mixins/MainVue'
+import MainVue from '~/mixins/MainVue';
 
 export default MainVue.extend({
   computed: {
     ...mapGetters({
-      isLoading: 'loader/getIsLoading'
-    })
-  }
-})
+      isLoading: 'loader/getIsLoading',
+    }),
+  },
+});
 </script>
 <style lang="scss" scoped>
 

@@ -29,20 +29,20 @@
   </div>
 </template>
 <script lang="ts">
-import MainVue from '~/mixins/MainVue'
-import { getUserAddress } from "~/utils/web3";
 import { mapActions, mapGetters } from 'vuex';
+import MainVue from '~/mixins/MainVue';
+import { getUserAddress } from '~/utils/web3';
 
 export default MainVue.extend({
   computed: {
     ...mapGetters({
       userBalances: 'token/getUserBalances',
       userAddress: 'web3/getUserWallet',
-      isWalletConnected: 'web3/getIsConnected'
-    })
+      isWalletConnected: 'web3/getIsConnected',
+    }),
   },
   async mounted() {
-    await this.checkWalletConnection()
+    await this.checkWalletConnection();
     if (this.isWalletConnected) {
       await this.getUserBalances();
     }
@@ -52,18 +52,18 @@ export default MainVue.extend({
       getUserBalances: 'token/getUserBalances',
       connectWalletAction: 'web3/connectWallet',
       checkWalletConnection: 'web3/checkWalletConnection',
-      disconnectWallet: 'web3/disconnectWallet'
+      disconnectWallet: 'web3/disconnectWallet',
     }),
     getUserAddress,
     async connectWallet() {
       this.SetLoader(true);
-      await this.checkWalletConnection()
+      await this.checkWalletConnection();
       await this.connectWalletAction();
       await this.getUserBalances();
       this.SetLoader(false);
     },
   },
-})
+});
 </script>
 <style lang="scss" scoped>
 .primary {

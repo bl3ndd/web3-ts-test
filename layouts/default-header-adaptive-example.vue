@@ -31,16 +31,16 @@
   </div>
 </template>
 <script lang="ts">
-import MainVue from '~/mixins/MainVue'
+import MainVue from '~/mixins/MainVue';
 
 export default MainVue.extend({
-  mounted () {
-    this.SetLoader(true)
+  mounted() {
+    this.SetLoader(true);
     setTimeout(() => {
-      this.SetLoader(false)
-    }, 1000)
-  }
-})
+      this.SetLoader(false);
+    }, 1000);
+  },
+});
 </script>
 <style lang="scss" scoped>
 .header {

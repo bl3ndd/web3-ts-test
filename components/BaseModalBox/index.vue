@@ -17,35 +17,35 @@
   </div>
 </template>
 <script lang="ts">
-import { mapGetters } from 'vuex'
-import MainVue from '~/mixins/MainVue'
+import { mapGetters } from 'vuex';
+import MainVue from '~/mixins/MainVue';
 
 export default MainVue.extend({
   props: {
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     isUnclosable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isHeader: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     ...mapGetters({
-      options: 'modals/getOptions'
-    })
+      options: 'modals/getOptions',
+    }),
   },
   methods: {
-    close () {
-      this.$store.dispatch('modals/hide')
-    }
-  }
-})
+    close() {
+      this.$store.dispatch('modals/hide');
+    },
+  },
+});
 </script>
 <style lang="scss" scoped>
 .base-modal {

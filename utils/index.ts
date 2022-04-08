@@ -1,5 +1,5 @@
 // @ts-nocheck
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 
 export interface IResponse {
   ok: boolean,
@@ -11,8 +11,8 @@ export interface IResponse {
 
 export const output = (res?: any): IResponse => ({
   ok: true,
-  result: res
-})
+  result: res,
+});
 
 export const error = (code?: number, msg?: string, data?: any, toast = false): IResponse => {
   if (toast) {
@@ -24,11 +24,11 @@ export const error = (code?: number, msg?: string, data?: any, toast = false): I
     ok: false,
     code,
     msg,
-    data
-  }
-}
+    data,
+  };
+};
 
 export const shiftedBy = (value: string, decimals: string, mode?: number | 0): string => {
-  const decimalsInt = mode === 0 ? parseInt(decimals) : -parseInt(decimals)
-  return new BigNumber(value).shiftedBy(decimalsInt).toString()
-}
+  const decimalsInt = mode === 0 ? parseInt(decimals) : -parseInt(decimals);
+  return new BigNumber(value).shiftedBy(decimalsInt).toString();
+};
